@@ -138,20 +138,22 @@ function buyHealth() {
 
 // Buy weapon if enough gold and not already maxed out
 function buyWeapon() {
+  // Check if there is a weapon to buy and enough gold
   if (currentWeapon < weapons.length - 1) {
     if (gold >= 30) {
       gold -= 30;
-      currentWeapon++;
+      currentWeapon++; // Upgrade to next weapon
       goldText.innerText = gold;
       let newWeapon = weapons[currentWeapon].name;
       text.innerText = "You now have a " + newWeapon + ".";
-      inventory.push(newWeapon);
+      inventory.push(newWeapon); // Add new weapon to inventory
       text.innerText += " In your inventory you have: " + inventory;
-    } else {
+    } else { // Not enough gold
       text.innerText = "You do not have enough gold to buy a weapon.";
     }
   } else {
     text.innerText = "You already have the most powerful weapon!";
+    // Change button to sell option if player has most powerful weapon
     button2.innerText = "Sell weapon for 15 gold";
     button2.onclick = sellWeapon;
   }
@@ -197,16 +199,21 @@ function goFight() {
 
 // Attack the monster and update health
 function attack() {
+  // Display attack messages
   text.innerText = "The " + monsters[fighting].name + " attacks.";
   text.innerText += " You attack it with your " + weapons[currentWeapon].name + ".";
+  // Update health based on monster's attack
   health -= getMonsterAttackValue(monsters[fighting].level);
+  // Check if the player hits the monster
   if (isMonsterHit()) {
     monsterHealth -= weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;    
   } else {
     text.innerText += " You miss.";
   }
+  // Update health and monster health display
   healthText.innerText = health;
   monsterHealthText.innerText = monsterHealth;
+  // Check if player or monster is defeated
   if (health <= 0) {
     lose();
   } else if (monsterHealth <= 0) {
@@ -216,6 +223,7 @@ function attack() {
       defeatMonster();
     }
   }
+  // 10% chance of weapon breaking
   if (Math.random() <= .1 && inventory.length !== 1) {
     text.innerText += " Your " + inventory.pop() + " breaks.";
     currentWeapon--;
@@ -241,10 +249,13 @@ function dodge() {
 
 // Defeat the monster and gain rewards
 function defeatMonster() {
+  // Add gold based on monster's level
   gold += Math.floor(monsters[fighting].level * 6.7);
+  // Add experience points based on monster's level
   xp += monsters[fighting].level;
   goldText.innerText = gold;
   xpText.innerText = xp;
+  // Move to the "kill monster" location
   update(locations[4]);
 }
 
