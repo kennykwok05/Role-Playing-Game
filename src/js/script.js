@@ -1,11 +1,12 @@
-let xp = 0;
-let health = 100;
-let gold = 50;
-let currentWeapon = 0;
-let fighting;
-let monsterHealth;
-let inventory = ["stick"];
+let xp = 0; // Experience points
+let health = 100; // Player's health
+let gold = 50; // Player's gold
+let currentWeapon = 0; // Index for current weapon
+let fighting; // Current monster index
+let monsterHealth; // Monster's health
+let inventory = ["stick"]; // Player's inventory with initial weapon
 
+// DOM elements for buttons and text updates
 const button1 = document.querySelector('#button1');
 const button2 = document.querySelector("#button2");
 const button3 = document.querySelector("#button3");
@@ -16,12 +17,14 @@ const goldText = document.querySelector("#goldText");
 const monsterStats = document.querySelector("#monsterStats");
 const monsterName = document.querySelector("#monsterName");
 const monsterHealthText = document.querySelector("#monsterHealth");
+// Array of weapons with name and power
 const weapons = [
   { name: 'stick', power: 5 },
   { name: 'dagger', power: 30 },
   { name: 'claw hammer', power: 50 },
   { name: 'sword', power: 100 }
 ];
+// Array of monsters with name, level, and health
 const monsters = [
   {
     name: "slime",
@@ -39,6 +42,7 @@ const monsters = [
     health: 300
   }
 ]
+// Locations in the game with button texts and actions
 const locations = [
   {
     name: "town square",
@@ -90,11 +94,12 @@ const locations = [
   }
 ];
 
-// initialize buttons
+// initialize buttons with default actions
 button1.onclick = goStore;
 button2.onclick = goCave;
 button3.onclick = fightDragon;
 
+// Update game interface based on the current location
 function update(location) {
   monsterStats.style.display = "none";
   button1.innerText = location["button text"][0];
@@ -106,18 +111,20 @@ function update(location) {
   text.innerHTML = location.text;
 }
 
+// Transition to different locations
+// Town square
 function goTown() {
   update(locations[0]);
 }
-
+// Store
 function goStore() {
   update(locations[1]);
 }
-
+// Cave
 function goCave() {
   update(locations[2]);
 }
-
+// Buy health if enough gold
 function buyHealth() {
   if (gold >= 10) {
     gold -= 10;
@@ -129,6 +136,7 @@ function buyHealth() {
   }
 }
 
+// Buy weapon if enough gold and not already maxed out
 function buyWeapon() {
   if (currentWeapon < weapons.length - 1) {
     if (gold >= 30) {
@@ -149,6 +157,7 @@ function buyWeapon() {
   }
 }
 
+// Sell the current weapon for 15 gold
 function sellWeapon() {
   if (inventory.length > 1) {
     gold += 15;
@@ -161,6 +170,7 @@ function sellWeapon() {
   }
 }
 
+// Start different fights based on selected monster
 function fightSlime() {
   fighting = 0;
   goFight();
@@ -176,14 +186,16 @@ function fightDragon() {
   goFight();
 }
 
+// Begin the fight with a chosen monster
 function goFight() {
-  update(locations[3]);
+  update(locations[3]); // Fight location
   monsterHealth = monsters[fighting].health;
   monsterStats.style.display = "block";
   monsterName.innerText = monsters[fighting].name;
   monsterHealthText.innerText = monsterHealth;
 }
 
+// Attack the monster and update health
 function attack() {
   text.innerText = "The " + monsters[fighting].name + " attacks.";
   text.innerText += " You attack it with your " + weapons[currentWeapon].name + ".";
@@ -210,20 +222,24 @@ function attack() {
   }
 }
 
+// Calculate the damage the monster deals
 function getMonsterAttackValue(level) {
   const hit = (level * 5) - (Math.floor(Math.random() * xp));
   console.log(hit);
   return hit > 0 ? hit : 0;
 }
 
+// Determine if the monster's attack hits
 function isMonsterHit() {
   return Math.random() > .2 || health < 20;
 }
 
+// Dodge the monster's attack
 function dodge() {
   text.innerText = "You dodge the attack from the " + monsters[fighting].name;
 }
 
+// Defeat the monster and gain rewards
 function defeatMonster() {
   gold += Math.floor(monsters[fighting].level * 6.7);
   xp += monsters[fighting].level;
@@ -232,14 +248,17 @@ function defeatMonster() {
   update(locations[4]);
 }
 
+// Handle losing the game
 function lose() {
   update(locations[5]);
 }
 
+// Handle winning the game
 function winGame() {
   update(locations[6]);
 }
 
+// Restart the game with initial values
 function restart() {
   xp = 0;
   health = 100;
@@ -252,10 +271,12 @@ function restart() {
   goTown();
 }
 
+// Easter egg function that leads to a mini-game
 function easterEgg() {
   update(locations[7]);
 }
 
+// Pick a number for the secret game (2 or 8)
 function pickTwo() {
   pick(2);
 }
@@ -264,23 +285,30 @@ function pickEight() {
   pick(8);
 }
 
+// Pick a number and check if it matches a randomly chosen one
 function pick(guess) {
   const numbers = [];
+  // Generate 10 random numbers between 0 and 10
   while (numbers.length < 10) {
     numbers.push(Math.floor(Math.random() * 11));
   }
+  // Display picked number and random numbers
   text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
   for (let i = 0; i < 10; i++) {
     text.innerText += numbers[i] + "\n";
   }
+  // Check if the guess is correct
   if (numbers.includes(guess)) {
+    // Correct guess: win gold
     text.innerText += "Right! You win 20 gold!";
     gold += 20;
     goldText.innerText = gold;
   } else {
+    // Incorrect guess: lose health
     text.innerText += "Wrong! You lose 10 health!";
     health -= 10;
     healthText.innerText = health;
+    // Trigger loss if health is 0 or less
     if (health <= 0) {
       lose();
     }
